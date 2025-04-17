@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strings"
 )
 
 func ValidateChirp(w http.ResponseWriter, r *http.Request) {
@@ -24,15 +25,12 @@ func ValidateChirp(w http.ResponseWriter, r *http.Request) {
 	}
 
 	type returnVals struct {
-		Valid bool `json:"valid"`
+		//Valid bool `json:"valid"`
+		CleanedBody string `json:"cleaned_body"`
 	}
 
 	type returnValsError struct {
 		Error string `json:"error"`
-	}
-
-	respBody := returnVals{
-		Valid: true,
 	}
 
 	if len(params.Body) > 140 {
@@ -45,6 +43,18 @@ func ValidateChirp(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(400)
 		w.Write(datErr)
+	}
+
+	cleanedBody := strings.Split(params.Body, " ")
+	for i, j := range cleanedBody {
+		if strings.ToLower(j) == "kerfuffle" || strings.ToLower(j) == "sharbert" || strings.ToLower(j) == "fornax" {
+			cleanedBody[i] = "****"
+		}
+	}
+
+	// profane words
+	respBody := returnVals{
+		CleanedBody: strings.Join(cleanedBody, " "),
 	}
 
 	dat, err := json.Marshal(respBody)
