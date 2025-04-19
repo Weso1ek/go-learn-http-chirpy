@@ -76,7 +76,7 @@ func main() {
 
 	mux.Handle("POST /api/validate_chirp", http.HandlerFunc(ValidateChirp))
 
-	mux.Handle("POST /api/users", http.HandlerFunc(cfg.CreateUser))
+	mux.Handle("POST /api/users", http.HandlerFunc(cfg.handlerUsersCreate))
 
 	srv := &http.Server{
 		Addr:    ":" + port,
