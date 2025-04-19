@@ -74,9 +74,10 @@ func main() {
 	mux.Handle("GET /admin/metrics", http.HandlerFunc(cfg.Hits))
 	mux.Handle("POST /admin/reset", http.HandlerFunc(cfg.Reset))
 
-	mux.Handle("POST /api/validate_chirp", http.HandlerFunc(ValidateChirp))
+	//mux.Handle("POST /api/validate_chirp", http.HandlerFunc(ValidateChirp))
 
 	mux.Handle("POST /api/users", http.HandlerFunc(cfg.handlerUsersCreate))
+	mux.Handle("POST /api/chirps", http.HandlerFunc(cfg.handlerChirpsCreate))
 
 	srv := &http.Server{
 		Addr:    ":" + port,
