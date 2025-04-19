@@ -15,6 +15,7 @@ import (
 type apiConfig struct {
 	fileserverHits atomic.Int32
 	dbQueries      *database.Queries
+	platform       string
 }
 
 func (cfg *apiConfig) middlewareMetricsInc(next http.Handler) http.Handler {
@@ -32,6 +33,19 @@ func (cfg *apiConfig) Hits(w http.ResponseWriter, r *http.Request) {
 
 func (cfg *apiConfig) Reset(w http.ResponseWriter, r *http.Request) {
 	cfg.fileserverHits.Store(0)
+
+	if cfg.platform != "dev" {
+		w.Header().Add("Content-Type", "text/plain; charset=utf-8")
+		w.WriteHeader(http.StatusForbidden)
+	}
+
+	err := cfg.dbQueries.DeleteUsers(r.Context())
+
+	if err != nil {
+		w.Header().Add("Content-Type", "text/plain; charset=utf-8")
+		w.WriteHeader(http.StatusInternalServerError)
+	}
+
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("Hits reset to 0"))
 }
@@ -52,6 +66,7 @@ func main() {
 	var cfg apiConfig
 
 	cfg.dbQueries = database.New(db)
+	cfg.platform = os.Getenv("PLATFORM")
 
 	mux := http.NewServeMux()
 	mux.Handle("/app/", cfg.middlewareMetricsInc(http.StripPrefix("/app", http.FileServer(http.Dir(filepathRoot)))))
@@ -60,6 +75,8 @@ func main() {
 	mux.Handle("POST /admin/reset", http.HandlerFunc(cfg.Reset))
 
 	mux.Handle("POST /api/validate_chirp", http.HandlerFunc(ValidateChirp))
+
+	mux.Handle("POST /api/users", http.HandlerFunc(cfg.CreateUser))
 
 	srv := &http.Server{
 		Addr:    ":" + port,
