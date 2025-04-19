@@ -17,6 +17,29 @@ type Chirp struct {
 	UserId    uuid.UUID `json:"user_id"`
 }
 
+func (cfg *apiConfig) handlerChirps(w http.ResponseWriter, r *http.Request) {
+	chirps, err := cfg.dbQueries.ListChirps(r.Context())
+
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "Couldn't list chirps", err)
+		return
+	}
+
+	var chirpsResp []Chirp
+
+	for _, j := range chirps {
+		chirpsResp = append(chirpsResp, Chirp{
+			ID:        j.ID,
+			CreatedAt: j.CreatedAt.Time,
+			UpdatedAt: j.UpdatedAt.Time,
+			Body:      j.Body,
+			UserId:    j.UserID,
+		})
+	}
+
+	respondWithJSON(w, http.StatusOK, chirpsResp)
+}
+
 func (cfg *apiConfig) handlerChirpsCreate(w http.ResponseWriter, r *http.Request) {
 	type parameters struct {
 		Body   string    `json:"body"`
