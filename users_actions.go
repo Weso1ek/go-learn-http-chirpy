@@ -3,7 +3,6 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"github.com/Weso1ek/chirpy/internal/auth"
 	"github.com/Weso1ek/chirpy/internal/database"
 	"net/http"
@@ -44,12 +43,6 @@ func (cfg *apiConfig) handlerLogin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	errCompare := auth.CheckPasswordHash(user.HashedPassword.String, params.Password)
-
-	fmt.Println("===")
-	fmt.Println(errCompare)
-	fmt.Println(user.HashedPassword)
-	fmt.Println("===")
-
 	if errCompare != nil {
 		respondWithError(w, http.StatusUnauthorized, "User not found", nil)
 	}
