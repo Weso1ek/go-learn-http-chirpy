@@ -36,7 +36,7 @@ func (cfg *apiConfig) handlerGetChirp(w http.ResponseWriter, r *http.Request) {
 		respondWithError(w, http.StatusNotFound, "Couldn't find chirp", errDb)
 	}
 
-	respondWithJSON(w, http.StatusCreated, response{
+	respondWithJSON(w, http.StatusOK, response{
 		Chirp: Chirp{
 			ID:        chirp.ID,
 			CreatedAt: chirp.CreatedAt.Time,
