@@ -73,6 +73,7 @@ func main() {
 	mux.Handle("GET /api/healthz", http.HandlerFunc(Health))
 	mux.Handle("GET /admin/metrics", http.HandlerFunc(cfg.Hits))
 	mux.Handle("POST /admin/reset", http.HandlerFunc(cfg.Reset))
+	mux.Handle("POST /api/login", http.HandlerFunc(cfg.handlerLogin))
 
 	//mux.Handle("POST /api/validate_chirp", http.HandlerFunc(ValidateChirp))
 
