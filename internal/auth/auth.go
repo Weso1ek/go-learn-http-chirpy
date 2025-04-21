@@ -6,6 +6,8 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
+	"net/http"
+	"strings"
 	"time"
 )
 
@@ -15,6 +17,18 @@ const (
 	// TokenTypeAccess -
 	TokenTypeAccess TokenType = "chirpy-access"
 )
+
+func GetBearerToken(headers http.Header) (string, error) {
+	header := headers.Get("Authorization")
+
+	if header == "" {
+		return "", errors.New("Authorization header not found")
+	}
+
+	token := strings.Replace("Bearer ", "", header, 1)
+
+	return token, nil
+}
 
 func HashPassword(password string) (string, error) {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
