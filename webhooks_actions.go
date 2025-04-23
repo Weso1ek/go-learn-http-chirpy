@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/Weso1ek/chirpy/internal/auth"
 	"github.com/google/uuid"
 	"net/http"
 )
@@ -15,6 +16,17 @@ func (cfg *apiConfig) handlerUserUpgrade(w http.ResponseWriter, r *http.Request)
 	type parameters struct {
 		Event string         `json:"event"`
 		Data  parametersData `json:"data"`
+	}
+
+	token, errToken := auth.GetAPIKey(r.Header)
+	if errToken != nil {
+		respondWithError(w, http.StatusUnauthorized, "No token", errToken)
+		return
+	}
+
+	if token != cfg.polkaKey {
+		respondWithError(w, http.StatusUnauthorized, "No token not equal", nil)
+		return
 	}
 
 	decoder := json.NewDecoder(r.Body)
