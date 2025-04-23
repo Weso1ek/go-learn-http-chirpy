@@ -75,6 +75,7 @@ func main() {
 	mux.Handle("GET /api/healthz", http.HandlerFunc(Health))
 	mux.Handle("POST /api/login", http.HandlerFunc(cfg.handlerLogin))
 	mux.Handle("POST /api/users", http.HandlerFunc(cfg.handlerUsersCreate))
+	mux.Handle("PUT /api/users", http.HandlerFunc(cfg.handlerUsersUpdate))
 	mux.Handle("POST /api/chirps", http.HandlerFunc(cfg.handlerChirpsCreate))
 	mux.Handle("GET /api/chirps", http.HandlerFunc(cfg.handlerChirps))
 	mux.Handle("GET /api/chirps/{chirpID}", http.HandlerFunc(cfg.handlerGetChirp))
