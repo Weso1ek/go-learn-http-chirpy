@@ -12,10 +12,11 @@ import (
 )
 
 type User struct {
-	ID        uuid.UUID `json:"id"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
-	Email     string    `json:"email"`
+	ID          uuid.UUID `json:"id"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
+	Email       string    `json:"email"`
+	IsChirpyRed bool      `json:"is_chirpy_red"`
 }
 
 func (cfg *apiConfig) handlerLogin(w http.ResponseWriter, r *http.Request) {
@@ -77,10 +78,11 @@ func (cfg *apiConfig) handlerLogin(w http.ResponseWriter, r *http.Request) {
 
 	respondWithJSON(w, http.StatusOK, response{
 		User: User{
-			ID:        user.ID,
-			CreatedAt: user.CreatedAt.Time,
-			UpdatedAt: user.UpdatedAt.Time,
-			Email:     user.Email.String,
+			ID:          user.ID,
+			CreatedAt:   user.CreatedAt.Time,
+			UpdatedAt:   user.UpdatedAt.Time,
+			Email:       user.Email.String,
+			IsChirpyRed: user.IsChirpyRed.Bool,
 		},
 		Token:        accessToken,
 		RefreshToken: refreshToken,
@@ -129,8 +131,9 @@ func (cfg *apiConfig) handlerUsersUpdate(w http.ResponseWriter, r *http.Request)
 
 	respondWithJSON(w, http.StatusOK, response{
 		User: User{
-			ID:    userID,
-			Email: user.Email.String,
+			ID:          userID,
+			Email:       user.Email.String,
+			IsChirpyRed: user.IsChirpyRed.Bool,
 		},
 	})
 }
@@ -169,10 +172,11 @@ func (cfg *apiConfig) handlerUsersCreate(w http.ResponseWriter, r *http.Request)
 
 	respondWithJSON(w, http.StatusCreated, response{
 		User: User{
-			ID:        user.ID,
-			CreatedAt: user.CreatedAt.Time,
-			UpdatedAt: user.UpdatedAt.Time,
-			Email:     user.Email.String,
+			ID:          user.ID,
+			CreatedAt:   user.CreatedAt.Time,
+			UpdatedAt:   user.UpdatedAt.Time,
+			Email:       user.Email.String,
+			IsChirpyRed: user.IsChirpyRed.Bool,
 		},
 	})
 }

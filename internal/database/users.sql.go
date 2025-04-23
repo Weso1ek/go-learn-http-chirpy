@@ -15,7 +15,7 @@ import (
 const createUser = `-- name: CreateUser :one
 INSERT INTO users (id, created_at, updated_at, email, hashed_password)
 VALUES (gen_random_uuid(), NOW(), NOW(), $1, $2)
-RETURNING id, created_at, updated_at, email, hashed_password
+RETURNING id, created_at, updated_at, email, hashed_password, is_chirpy_red
 `
 
 type CreateUserParams struct {
@@ -32,12 +32,13 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		&i.UpdatedAt,
 		&i.Email,
 		&i.HashedPassword,
+		&i.IsChirpyRed,
 	)
 	return i, err
 }
 
 const getUserByLogin = `-- name: GetUserByLogin :one
-SELECT id, created_at, updated_at, email, hashed_password FROM users
+SELECT id, created_at, updated_at, email, hashed_password, is_chirpy_red FROM users
 WHERE email = $1 LIMIT 1
 `
 
@@ -50,6 +51,7 @@ func (q *Queries) GetUserByLogin(ctx context.Context, email sql.NullString) (Use
 		&i.UpdatedAt,
 		&i.Email,
 		&i.HashedPassword,
+		&i.IsChirpyRed,
 	)
 	return i, err
 }
@@ -57,7 +59,7 @@ func (q *Queries) GetUserByLogin(ctx context.Context, email sql.NullString) (Use
 const updateUser = `-- name: UpdateUser :one
 UPDATE users SET email = $1, hashed_password = $2
 WHERE id = $3
-RETURNING id, created_at, updated_at, email, hashed_password
+RETURNING id, created_at, updated_at, email, hashed_password, is_chirpy_red
 `
 
 type UpdateUserParams struct {
@@ -75,6 +77,27 @@ func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, e
 		&i.UpdatedAt,
 		&i.Email,
 		&i.HashedPassword,
+		&i.IsChirpyRed,
+	)
+	return i, err
+}
+
+const updateUserRed = `-- name: UpdateUserRed :one
+UPDATE users SET is_chirpy_red = TRUE
+WHERE id = $1
+RETURNING id, created_at, updated_at, email, hashed_password, is_chirpy_red
+`
+
+func (q *Queries) UpdateUserRed(ctx context.Context, id uuid.UUID) (User, error) {
+	row := q.db.QueryRowContext(ctx, updateUserRed, id)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.Email,
+		&i.HashedPassword,
+		&i.IsChirpyRed,
 	)
 	return i, err
 }

@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/Weso1ek/chirpy/internal/auth"
 	"github.com/Weso1ek/chirpy/internal/database"
 	"net/http"
