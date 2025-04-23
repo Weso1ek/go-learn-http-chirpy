@@ -5,6 +5,7 @@ import (
 	"github.com/Weso1ek/chirpy/internal/auth"
 	"github.com/Weso1ek/chirpy/internal/database"
 	"net/http"
+	"sort"
 	"time"
 
 	"github.com/google/uuid"
@@ -88,6 +89,7 @@ func (cfg *apiConfig) handlerGetChirp(w http.ResponseWriter, r *http.Request) {
 }
 
 func (cfg *apiConfig) handlerChirps(w http.ResponseWriter, r *http.Request) {
+	sortParam := r.URL.Query().Get("sort")
 	authorId := r.URL.Query().Get("author_id")
 	authorUUID, _ := uuid.Parse(authorId)
 
@@ -110,6 +112,12 @@ func (cfg *apiConfig) handlerChirps(w http.ResponseWriter, r *http.Request) {
 				UserId:    j.UserID,
 			})
 		}
+	}
+
+	if sortParam == "desc" {
+		sort.Slice(chirpsResp, func(i, j int) bool {
+			return chirpsResp[j].CreatedAt.Before(chirpsResp[i].CreatedAt)
+		})
 	}
 
 	respondWithJSON(w, http.StatusOK, chirpsResp)
