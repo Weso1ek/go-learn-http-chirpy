@@ -45,7 +45,11 @@ func (cfg *apiConfig) handlerDeleteChirp(w http.ResponseWriter, r *http.Request)
 		respondWithError(w, http.StatusNoContent, "Chirp not found 404", err)
 		return
 	}
-	
+
+	if chirp.UserID != userID {
+		respondWithError(w, http.StatusForbidden, "Forbidden", err)
+	}
+
 	errDb := cfg.dbQueries.DeleteChirp(r.Context(), chirpUUID)
 	if errDb != nil {
 		respondWithError(w, http.StatusNotFound, "Couldn't delete chirp", errDb)
