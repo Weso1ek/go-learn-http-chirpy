@@ -73,16 +73,18 @@ func main() {
 	mux := http.NewServeMux()
 	mux.Handle("/app/", cfg.middlewareMetricsInc(http.StripPrefix("/app", http.FileServer(http.Dir(filepathRoot)))))
 	mux.Handle("GET /api/healthz", http.HandlerFunc(Health))
-	mux.Handle("GET /admin/metrics", http.HandlerFunc(cfg.Hits))
-	mux.Handle("POST /admin/reset", http.HandlerFunc(cfg.Reset))
 	mux.Handle("POST /api/login", http.HandlerFunc(cfg.handlerLogin))
-
-	//mux.Handle("POST /api/validate_chirp", http.HandlerFunc(ValidateChirp))
-
 	mux.Handle("POST /api/users", http.HandlerFunc(cfg.handlerUsersCreate))
 	mux.Handle("POST /api/chirps", http.HandlerFunc(cfg.handlerChirpsCreate))
 	mux.Handle("GET /api/chirps", http.HandlerFunc(cfg.handlerChirps))
 	mux.Handle("GET /api/chirps/{chirpID}", http.HandlerFunc(cfg.handlerGetChirp))
+	mux.Handle("POST /api/refresh", http.HandlerFunc(cfg.handlerRefresh))
+	mux.Handle("POST /api/revoke", http.HandlerFunc(cfg.handlerRevoke))
+
+	mux.Handle("GET /admin/metrics", http.HandlerFunc(cfg.Hits))
+	mux.Handle("POST /admin/reset", http.HandlerFunc(cfg.Reset))
+
+	//mux.Handle("POST /api/validate_chirp", http.HandlerFunc(ValidateChirp))
 
 	srv := &http.Server{
 		Addr:    ":" + port,

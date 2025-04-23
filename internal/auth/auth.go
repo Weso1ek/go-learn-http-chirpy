@@ -1,6 +1,8 @@
 package auth
 
 import (
+	"crypto/rand"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"github.com/golang-jwt/jwt/v5"
@@ -20,6 +22,17 @@ const (
 	// TokenTypeAccess -
 	TokenTypeAccess TokenType = "chirpy-access"
 )
+
+// MakeRefreshToken makes a random 256 bit token
+// encoded in hex
+func MakeRefreshToken() (string, error) {
+	token := make([]byte, 32)
+	_, err := rand.Read(token)
+	if err != nil {
+		return "", err
+	}
+	return hex.EncodeToString(token), nil
+}
 
 // GetBearerToken -
 func GetBearerToken(headers http.Header) (string, error) {
