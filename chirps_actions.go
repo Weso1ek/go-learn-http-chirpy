@@ -88,6 +88,9 @@ func (cfg *apiConfig) handlerGetChirp(w http.ResponseWriter, r *http.Request) {
 }
 
 func (cfg *apiConfig) handlerChirps(w http.ResponseWriter, r *http.Request) {
+	authorId := r.URL.Query().Get("author_id")
+	authorUUID, _ := uuid.Parse(authorId)
+
 	chirps, err := cfg.dbQueries.ListChirps(r.Context())
 
 	if err != nil {
@@ -98,13 +101,15 @@ func (cfg *apiConfig) handlerChirps(w http.ResponseWriter, r *http.Request) {
 	var chirpsResp []Chirp
 
 	for _, j := range chirps {
-		chirpsResp = append(chirpsResp, Chirp{
-			ID:        j.ID,
-			CreatedAt: j.CreatedAt.Time,
-			UpdatedAt: j.UpdatedAt.Time,
-			Body:      j.Body,
-			UserId:    j.UserID,
-		})
+		if authorId == "" || (authorId != "" && j.UserID == authorUUID) {
+			chirpsResp = append(chirpsResp, Chirp{
+				ID:        j.ID,
+				CreatedAt: j.CreatedAt.Time,
+				UpdatedAt: j.UpdatedAt.Time,
+				Body:      j.Body,
+				UserId:    j.UserID,
+			})
+		}
 	}
 
 	respondWithJSON(w, http.StatusOK, chirpsResp)
