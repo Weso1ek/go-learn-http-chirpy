@@ -66,9 +66,8 @@ func (cfg *apiConfig) handlerLogin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	_, err = cfg.dbQueries.CreateRefreshToken(r.Context(), database.CreateRefreshTokenParams{
-		UserID: user.ID,
-		Token:  refreshToken,
-		//ExpiresAt: time.Now().UTC().Add(time.Hour * 24 * 60),
+		UserID:    user.ID,
+		Token:     refreshToken,
 		ExpiresAt: sql.NullTime{Time: time.Now().UTC().Add(time.Hour * 24 * 60), Valid: true},
 	})
 	if err != nil {
