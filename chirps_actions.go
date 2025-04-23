@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/Weso1ek/chirpy/internal/auth"
 	"github.com/Weso1ek/chirpy/internal/database"
 	"net/http"
@@ -16,6 +17,41 @@ type Chirp struct {
 	UpdatedAt time.Time `json:"updated_at"`
 	Body      string    `json:"body"`
 	UserId    uuid.UUID `json:"user_id"`
+}
+
+func (cfg *apiConfig) handlerDeleteChirp(w http.ResponseWriter, r *http.Request) {
+	token, err := auth.GetBearerToken(r.Header)
+	if err != nil {
+		respondWithError(w, http.StatusUnauthorized, "Couldn't find JWT", err)
+		return
+	}
+	userID, errValidate := auth.ValidateJWT(token, cfg.secret)
+	if errValidate != nil {
+		respondWithError(w, http.StatusForbidden, "Couldn't validate JWT", err)
+		return
+	}
+
+	chirpId := r.PathValue("chirpID")
+
+	chirpUUID, err := uuid.Parse(chirpId)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "Couldn't list chirps", err)
+		return
+	}
+
+	chirp, errGet := cfg.dbQueries.GetChirp(r.Context(), chirpUUID)
+
+	if errGet != nil {
+		respondWithError(w, http.StatusNoContent, "Chirp not found 404", err)
+		return
+	}
+	
+	errDb := cfg.dbQueries.DeleteChirp(r.Context(), chirpUUID)
+	if errDb != nil {
+		respondWithError(w, http.StatusNotFound, "Couldn't delete chirp", errDb)
+	}
+
+	respondWithJSON(w, http.StatusNoContent, nil)
 }
 
 func (cfg *apiConfig) handlerGetChirp(w http.ResponseWriter, r *http.Request) {
